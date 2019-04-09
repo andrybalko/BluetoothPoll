@@ -132,6 +132,14 @@ namespace BluetoothPoll.Droid
 						//continue
 					    RequestDevices();
 					}
+				    else
+				    {
+					    BluetoothAdapter adapter = BluetoothAdapter.DefaultAdapter;
+						adapter.CancelDiscovery();
+					    TaskCompletionSource.SetResult(false);
+					    Toast.MakeText(this, "You must to grant Bluetooth and Location permissions to use this app", 
+						    ToastLength.Long).Show();
+					}
 				    break;
 			    default:
 				    break;
