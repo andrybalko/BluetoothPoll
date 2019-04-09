@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BluetoothPoll.Views.PollPage"
+             xmlns:mvvm="clr-namespace:Prism.Mvvm;assembly=Prism.Forms"
+             xmlns:converters="clr-namespace:BluetoothPoll.Converters;assembly=BluetoothPoll"
+             mvvm:ViewModelLocator.AutowireViewModel="True"
+             Title="Devices">
+	<ContentPage.Resources>
+		<ResourceDictionary>
+			<converters:InvertConverter x:Key="InverseBooleanConverter"></converters:InvertConverter>
+		</ResourceDictionary>
+	</ContentPage.Resources>
+	<ContentPage.Content>
+		<RelativeLayout Padding="0">
+			<!-- Background -->
+			<Image x:Name="Bg"
+				Aspect="AspectFill"
+				RelativeLayout.WidthConstraint= "{ConstraintExpression Type=RelativeToParent, Property=Width}"
+				RelativeLayout.HeightConstraint= "{ConstraintExpression Type=RelativeToParent, Property=Height}">
+			</Image>
+			<Grid 
+				RelativeLayout.WidthConstraint= "{ConstraintExpression Type=RelativeToParent, Property=Width}"
+				RelativeLayout.HeightConstraint= "{ConstraintExpression Type=RelativeToParent, Property=Height}">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="*"></RowDefinition>
+					<RowDefinition Height="60"></RowDefinition>
+				</Grid.RowDefinitions>
+
+				<ListView Grid.Row="0" ItemsSource="{Binding Devices}" 
+				          SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}"
+				          IsPullToRefreshEnabled="True"
+				          RefreshCommand="{Binding PollBtDevicesCommand}"
+				          IsRefreshing="{Binding IsRequesting}">
+					<ListView.ItemTemplate>
+						<DataTemplate>
+							<ViewCell Height="40">
+								<StackLayout Orientation="Horizontal" Margin="10, 0">
+									<Label Text="{Binding Name}" VerticalTextAlignment="Center" HorizontalOptions="FillAndExpand"
+									       VerticalOptions="CenterAndExpand" FontSize="Small"></Label>
+									<Label Text="{Binding Mac}" VerticalTextAlignment="Center" HorizontalOptions="End"
+									       HorizontalTextAlignment="End"
+									       VerticalOptions="CenterAndExpand" FontSize="Micro"></Label>
+								</StackLayout>
+
+							</ViewCell>
+
+						</DataTemplate>
+					</ListView.ItemTemplate>
+				</ListView>
+				<Button  Grid.Row="1" Text="Poll" Command="{Binding PollBtDevicesCommand}"
+				         IsEnabled="{Binding IsRequesting, Converter={StaticResource InverseBooleanConverter}}"></Button>
+			</Grid>
+		</RelativeLayout>
+		
+    </ContentPage.Content>
+</ContentPage>
