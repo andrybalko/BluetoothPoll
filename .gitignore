@@ -1,4 +1,5 @@
 .vs
 /bin/*
-Debug
+packages
 obj
+bin

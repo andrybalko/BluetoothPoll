@@ -6,12 +6,14 @@ using Android.Bluetooth;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
+using Android.Support.V4.App;
 using Android.Widget;
 using BluetoothPoll.Models;
 using Plugin.CurrentActivity;
 using Prism;
 using Prism.Ioc;
 using Xamarin.Forms;
+using TaskStackBuilder = Android.App.TaskStackBuilder;
 
 namespace BluetoothPoll.Droid
 {
@@ -24,7 +26,11 @@ namespace BluetoothPoll.Droid
 
 		private BluetoothIntentReceiver _receiver;
 
-	    protected override void OnCreate(Bundle bundle)
+	    static readonly int NOTIFICATION_ID = 100500;
+	    static readonly string CHANNEL_ID = "local_notification";
+	    internal static readonly string CLOSE_DEVICE = "deviceClose";
+
+		protected override void OnCreate(Bundle bundle)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
             ToolbarResource = Resource.Layout.Toolbar;
@@ -34,14 +40,20 @@ namespace BluetoothPoll.Droid
             global::Xamarin.Forms.Forms.Init(this, bundle);
             LoadApplication(new App());
 
-	        _receiver = new BluetoothIntentReceiver();
+	        CreateNotificationChannel();
+
+			_receiver = new BluetoothIntentReceiver();
 	        CrossCurrentActivity.Current.Init(this, bundle);
 		}
 
 	    protected override void OnResume()
 	    {
 		    base.OnResume();
-		    RegisterReceiver(_receiver, new IntentFilter(BluetoothDevice.ActionFound));
+			var f = new IntentFilter();
+			f.AddAction(BluetoothDevice.ActionFound);
+			f.AddAction(BluetoothDevice.ActionUuid);
+			f.AddAction(BluetoothAdapter.ActionDiscoveryFinished);
+		    RegisterReceiver(_receiver, f);
 		}
 
 	    protected override void OnPause()
@@ -144,6 +156,38 @@ namespace BluetoothPoll.Droid
 			    default:
 				    break;
 		    }
+	    }
+
+
+	    public void SendLocalNotification()
+	    {
+		    NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+			    .SetContentTitle("Device Proximity Alert")
+			    .SetContentText("We are close to required bluetooth device!").
+			    SetSmallIcon(Resource.Drawable.bt);
+
+		    // Finally, publish the notification:
+		    var notificationManager = NotificationManagerCompat.From(this);
+		    notificationManager.Notify(NOTIFICATION_ID, builder.Build());
+		}
+
+	    private void CreateNotificationChannel()
+	    {
+		    if (Build.VERSION.SdkInt < BuildVersionCodes.O)
+		    {
+			    // Notification channels are new in API 26 (and not a part of the
+			    // support library). There is no need to create a notification
+			    // channel on older versions of Android.
+			    return;
+		    }
+
+		    var channel = new NotificationChannel(CHANNEL_ID, "Proximity alert", NotificationImportance.Default)
+		    {
+			    Description = "Notification about close looked up device"
+		    };
+
+		    var notificationManager = (NotificationManager)GetSystemService(NotificationService);
+		    notificationManager.CreateNotificationChannel(channel);
 	    }
 	}
 
