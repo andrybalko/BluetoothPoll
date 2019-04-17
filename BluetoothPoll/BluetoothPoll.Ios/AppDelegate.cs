@@ -5,6 +5,7 @@ using Foundation;
 using Prism;
 using Prism.Ioc;
 using UIKit;
+using UserNotifications;
 using Xamarin.Forms;
 
 namespace BluetoothPoll.Ios
@@ -24,56 +25,47 @@ namespace BluetoothPoll.Ios
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
-			
-			global::Xamarin.Forms.Forms.Init();
+            if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
+            {
+                UNUserNotificationCenter center = UNUserNotificationCenter.Current;
+                center.RequestAuthorization(UNAuthorizationOptions.Alert | UNAuthorizationOptions.Sound, (bool arg1, NSError arg2) =>{});
+                center.Delegate = new NotificationDelegate();
+            }
+            else if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
+            {
+                var settings = UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Sound, new NSSet());
+                UIApplication.SharedApplication.RegisterUserNotificationSettings(settings);
+            }
+
+            global::Xamarin.Forms.Forms.Init();
 	        LoadApplication(new App(new iOSInitializer()));
 			return base.FinishedLaunching(application, launchOptions);
 		}
 
-        public override void OnResignActivation(UIApplication application)
+
+        public override void ReceivedLocalNotification(UIApplication application, UILocalNotification notification)
         {
-            // Invoked when the application is about to move from active to inactive state.
-            // This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message)
-            // or when the user quits the application and it begins the transition to the background state.
-            // Games should use this method to pause the game.
+            // show an alert
+            UIAlertController okayAlertController = UIAlertController.Create(notification.AlertAction, notification.AlertBody, UIAlertControllerStyle.Alert);
+            okayAlertController.AddAction(UIAlertAction.Create("OK", UIAlertActionStyle.Default, null));
+            UIApplication.SharedApplication.KeyWindow.RootViewController.PresentViewController(okayAlertController, true, null);
         }
-
-        public override void DidEnterBackground(UIApplication application)
-        {
-            // Use this method to release shared resources, save user data, invalidate timers and store the application state.
-            // If your application supports background exection this method is called instead of WillTerminate when the user quits.
-        }
-
-        public override void WillEnterForeground(UIApplication application)
-        {
-            // Called as part of the transiton from background to active state.
-            // Here you can undo many of the changes made on entering the background.
-        }
-
-        public override void OnActivated(UIApplication application)
-        {
-            // Restart any tasks that were paused (or not yet started) while the application was inactive.
-            // If the application was previously in the background, optionally refresh the user interface.
-        }
-
-        public override void WillTerminate(UIApplication application)
-        {
-            // Called when the application is about to terminate. Save data, if needed. See also DidEnterBackground.
-        }
-
-
-		
-
-	}
+    }
 
 	public class iOSInitializer : IPlatformInitializer
 	{
 		public void RegisterTypes(IContainerRegistry containerRegistry)
 		{
-			// Register any platform specific implementations
 		}
 	}
 
-	
+    public class NotificationDelegate : UNUserNotificationCenterDelegate
+    {
+        public override void WillPresentNotification(UNUserNotificationCenter center, UNNotification notification, Action<UNNotificationPresentationOptions> completionHandler)
+        {
+            completionHandler(UNNotificationPresentationOptions.Alert | UNNotificationPresentationOptions.Sound);
+        }
+
+    }
 }
 

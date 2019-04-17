@@ -14,7 +14,10 @@ namespace BluetoothPoll.ViewModels
 {
     public class PollViewModel:ViewModelBase
     {
-		private bool _isRequesting;
+
+        public static readonly string LOOKUP_UUID = "00001105-0000-1000-8000-00805f9b34fb";
+
+        private bool _isRequesting;
 	    private BtDevice _selectedItem;
 
 		public ObservableCollection<BtDevice> Devices { get; set; }
@@ -59,7 +62,7 @@ namespace BluetoothPoll.ViewModels
 		    MessagingCenter.Subscribe<App, BtDevice>((App)Application.Current, BtDevice.NewDevice, (app, device) =>
 		    {
 			    var exist = Devices.FirstOrDefault(btDevice =>
-				    btDevice.Name == device.Name || btDevice.Mac == device.Mac);
+                                                   btDevice.Name == device.Name || (btDevice.Mac == device.Mac && device.Mac != "-"));
 
 			    if (exist == null)
 			    {

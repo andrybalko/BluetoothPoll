@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BluetoothPoll.Views.PollPage"
@@ -29,6 +29,7 @@
 
 				<ListView Grid.Row="0" ItemsSource="{Binding Devices}" 
 				          SelectedItem="{Binding SelectedItem, Mode=OneWayToSource}"
+                          CachingStrategy="RecycleElement" HasUnevenRows="true"
 				          IsPullToRefreshEnabled="True"
 				          RefreshCommand="{Binding PollBtDevicesCommand}"
 				          IsRefreshing="{Binding IsRequesting}">

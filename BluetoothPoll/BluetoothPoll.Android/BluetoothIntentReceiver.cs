@@ -12,6 +12,7 @@ using Android.Util;
 using Android.Views;
 using Android.Widget;
 using BluetoothPoll.Models;
+using BluetoothPoll.ViewModels;
 using Java.Util;
 using Plugin.CurrentActivity;
 using Xamarin.Forms;
@@ -39,9 +40,7 @@ namespace BluetoothPoll.Droid
 
 		private List<BluetoothDevice> Devices = new List<BluetoothDevice>();
 
-		private static readonly string LOOKUP_UUID = "3f234454-cf6d-4a0f-adf2-f4911ba9a111";
-		//private static readonly string LOOKUP_UUID = "00001105-0000-1000-8000-00805f9b34fb";
-
+		
 		public override void OnReceive(Context context, Intent intent)
 		{
 			var action = intent.Action;
@@ -53,7 +52,7 @@ namespace BluetoothPoll.Droid
 				{
 					foreach (ParcelUuid uuid in uuids)
 					{
-						if (uuid.Uuid.ToString().Equals(LOOKUP_UUID))
+						if (uuid.Uuid.ToString().Equals(PollViewModel.LOOKUP_UUID))
 						{
 							//notify about nearby device
 							var act = ((MainActivity)CrossCurrentActivity.Current.Activity);
