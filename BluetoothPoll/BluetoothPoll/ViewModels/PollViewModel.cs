@@ -15,7 +15,7 @@ namespace BluetoothPoll.ViewModels
     public class PollViewModel:ViewModelBase
     {
 
-        public static readonly string LOOKUP_UUID = "00001105-0000-1000-8000-00805f9b34fb";
+        public static readonly string LOOKUP_UUID = "3f234454-cf6d-4a0f-adf2-f4911ba9a111";
 
         private bool _isRequesting;
 	    private BtDevice _selectedItem;
