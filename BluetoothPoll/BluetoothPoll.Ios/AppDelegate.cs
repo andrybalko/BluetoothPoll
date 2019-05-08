@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using BluetoothPoll.Ios.Services;
+using BluetoothPoll.ViewModels;
 using CoreBluetooth;
+using CoreLocation;
 using Foundation;
 using Prism;
 using Prism.Ioc;
@@ -15,8 +19,10 @@ namespace BluetoothPoll.Ios
     [Register("AppDelegate")]
     public class AppDelegate : global::Xamarin.Forms.Platform.iOS.FormsApplicationDelegate
 	{
+
         // class-level declarations
 
+		private BeaconMonitor _beaconMonitor;
         public override UIWindow Window
         {
             get;
@@ -25,6 +31,9 @@ namespace BluetoothPoll.Ios
 
         public override bool FinishedLaunching(UIApplication application, NSDictionary launchOptions)
         {
+            global::Xamarin.Forms.Forms.Init();
+            LoadApplication(new App(new iOSInitializer()));
+
             if (UIDevice.CurrentDevice.CheckSystemVersion(10, 0))
             {
                 UNUserNotificationCenter center = UNUserNotificationCenter.Current;
@@ -37,11 +46,15 @@ namespace BluetoothPoll.Ios
                 UIApplication.SharedApplication.RegisterUserNotificationSettings(settings);
             }
 
-            global::Xamarin.Forms.Forms.Init();
-	        LoadApplication(new App(new iOSInitializer()));
+			//instantiate beacon tracker
+			_beaconMonitor = new BeaconMonitor();
+            
+
+           
 			return base.FinishedLaunching(application, launchOptions);
 		}
 
+       
 
         public override void ReceivedLocalNotification(UIApplication application, UILocalNotification notification)
         {
@@ -66,6 +79,14 @@ namespace BluetoothPoll.Ios
             completionHandler(UNNotificationPresentationOptions.Alert | UNNotificationPresentationOptions.Sound);
         }
 
+    }
+
+    public class BeaconItem
+    {
+        public string Minor { get; set; }
+        public string Name { get; set; }
+        public double CurrentDistance { get; set; }
+        public CLProximity Proximity { get; set; }
     }
 }
 

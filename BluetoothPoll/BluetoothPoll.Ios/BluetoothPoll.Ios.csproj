@@ -160,6 +160,7 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
+    <Compile Include="Services\BeaconMonitor.cs" />
     <Compile Include="Services\PollBtDevices.cs" />
     <Compile Include="ViewController.cs" />
     <Compile Include="ViewController.designer.cs">
